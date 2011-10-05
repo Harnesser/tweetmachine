@@ -1,0 +1,13 @@
+== Web Service
+AppEngine app to read contact twitter and return a JSON search results thing
+for searching for milklabs.
+The JSON format will parse out user names and colout them green. It will parse out
+hashtags and colour them orange. Links will be replaced with something that 
+will display a globe.
+The appengine thing wil poll the twitter search once every 10/1 minute? Testing?
+Rate limiting?
+
+== Arduino
+Sketch to fetch a JSON file from the web service and display the text on the 
+Sure LED things. There are 2 32x16 bicolour panels.
+Based on the xxxx library, 
