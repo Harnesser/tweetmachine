@@ -4,6 +4,7 @@ import (
     "fmt"
     "http"
     "io/ioutil"
+    "arduino_json"
 )
 
 func init() {
@@ -17,11 +18,13 @@ func handler(w http.ResponseWriter, r *http.Request ) {
 
 func marty_handler(w http.ResponseWriter, r *http.Request ) {
     fmt.Fprintf(w, "MARTYTY!!!")
-    read_dev_json(w)
+    readDevJSON(w)
+    tweets := arduino_json.RewriteTwitterJSON("sdfadsfa")
+    fmt.Fprintf(w, "%s", tweets)
 }
 
 
-func read_dev_json(w http.ResponseWriter){
+func readDevJSON(w http.ResponseWriter){
 
     // Open file
     buf, err := ioutil.ReadFile("./dev_data/search.milklabs.json")
