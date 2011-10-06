@@ -6,3 +6,7 @@ api_version: 2
 handlers:
 - url: /.*
   script: _go_app
+- url: /marty
+  script: _go_app
+- url: /dev_data
+  static_dir: static/dev_data
