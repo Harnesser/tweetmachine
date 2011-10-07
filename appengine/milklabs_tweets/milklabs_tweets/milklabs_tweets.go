@@ -18,22 +18,12 @@ func handler(w http.ResponseWriter, r *http.Request ) {
 
 func marty_handler(w http.ResponseWriter, r *http.Request ) {
     fmt.Fprintf(w, "MARTYTY!!!")
-    readDevJSON(w)
-    
-    hello := []byte("adbadsfouhaosiudhfoausdhf\n")
-    tweets := arduino_json.RewriteTwitterJSON(hello)
-    fmt.Fprintf(w, "%s", tweets)
-}
-
-
-func readDevJSON(w http.ResponseWriter){
-
-    // Open file
+    fmt.Fprintf(w, "<P>")
     buf, err := ioutil.ReadFile("./dev_data/search.milklabs.json")
-    if err == nil {
-        fmt.Fprintf(w, "%s", buf)
-    } else {
-        fmt.Fprintf(w, "ERERER")
+    if err != nil {
+        fmt.Fprintf(w, "Error: %s", err.String() )
+        return
     }
-    
+    tweets := arduino_json.RewriteTwitterJSON(buf)
+    fmt.Fprintf(w, "%s", tweets)
 }

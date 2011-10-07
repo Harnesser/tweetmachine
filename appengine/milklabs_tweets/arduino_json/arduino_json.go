@@ -39,12 +39,12 @@ func RewriteTwitterJSON( tw_str []byte ) string {
  
     data, err := get_json_data(tw_str)
     if err != nil {
-        return "Something went wrong again"
+        return err.String()
     }
     
     for _, res := range data.Results {
         fmt.Println(res.From_user)
-        retstr = fmt.Sprintf("asdf %s", res.From_user)
+        retstr = fmt.Sprintf("User: %s", res.From_user)
     }
     return retstr
 }
