@@ -25,5 +25,5 @@ func marty_handler(w http.ResponseWriter, r *http.Request ) {
         return
     }
     tweets := arduino_json.RewriteTwitterJSON(buf)
-    fmt.Fprintf(w, "%s", tweets)
+    fmt.Fprintf(w, "<PRE>%s</PRE>", tweets)
 }
