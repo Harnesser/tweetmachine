@@ -44,7 +44,8 @@ func RewriteTwitterJSON( tw_str []byte ) string {
     
     for _, res := range data.Results {
         fmt.Println(res.From_user)
-        retstr = fmt.Sprintf("User: %s", res.From_user)
+        retstr += fmt.Sprintf("<P>User: %s", res.From_user)
+        retstr += fmt.Sprintf("<BR><PRE>%s</PRE>", res.Text )
     }
     return retstr
 }
