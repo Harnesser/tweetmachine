@@ -19,7 +19,9 @@ func handler(w http.ResponseWriter, r *http.Request ) {
 func marty_handler(w http.ResponseWriter, r *http.Request ) {
     fmt.Fprintf(w, "MARTYTY!!!")
     readDevJSON(w)
-    tweets := arduino_json.RewriteTwitterJSON("sdfadsfa")
+    
+    hello := []byte("adbadsfouhaosiudhfoausdhf\n")
+    tweets := arduino_json.RewriteTwitterJSON(hello)
     fmt.Fprintf(w, "%s", tweets)
 }
 
