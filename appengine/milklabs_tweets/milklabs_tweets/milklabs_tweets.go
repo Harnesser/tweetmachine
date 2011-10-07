@@ -17,8 +17,6 @@ func handler(w http.ResponseWriter, r *http.Request ) {
 }
 
 func marty_handler(w http.ResponseWriter, r *http.Request ) {
-    fmt.Fprintf(w, "MARTYTY!!!")
-    fmt.Fprintf(w, "<P>")
     buf, err := ioutil.ReadFile("./dev_data/search.milklabs.json")
     if err != nil {
         fmt.Fprintf(w, "Error: %s", err.String() )
