@@ -246,21 +246,38 @@ void setup()
 }
 
 
+#define SERBUF_SIZE 140*5 // Roughly 5 tweets
+char serial_buffer[SERBUF_SIZE]; 
 char disp_str[STRING_MAX] ;
 int x_pos=0;
 int y_pos=0;
 int string_width;
+
+int i_serbuf;
+char startstr[] = "MILKLABTWEET";
+
 void loop()
-{   
-  if( Serial.available() ) {     
-    // Copy serial chars into string buffer
-    for (int ii=0; ii<STRING_MAX; ii++ ) {
-     if( Serial.available() > 0 )
-       disp_str[ii] = Serial.read();
-     else
-       disp_str[ii] = '\0'; // overwrite prev longer strings...
+{ 
+  
+  // Fill serial buffer with tweet goodnesss
+  if( Serial.available() ) {
+    delay(100); // This delay seems to be very important
+    i_serbuf = 0;
+    while( Serial.available() > 0 ) {  
+       serial_buffer[i_serbuf++] = Serial.read();  
     }
-   
+    serial_buffer[i_serbuf] = '\0';
+    
+    Serial.println("Buffer--------");
+    Serial.println(serial_buffer);
+    Serial.println("--------------");
+    
+    // Copy tweet data into display buffer
+    for(int ii=0; ii<STRING_MAX; ii++ ) {
+      disp_str[ii] = serial_buffer[ii];
+    }
+    disp_str[STRING_MAX-1] = '\0';
+    
     // Blank the LED array
     x_pos = DISPLAY_WIDTH;
     y_pos = 0;
@@ -284,6 +301,6 @@ void loop()
   clear_array(green_array);
   draw_text(disp_str, x_pos, y_pos);
   render();
-  delay(25);
+  
 }
  
