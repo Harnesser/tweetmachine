@@ -64,6 +64,7 @@ void clear_array(byte array [][DISPLAY_WIDTH/8] )
 
 
 // Copy a small image to the full array
+// allow -ve positional values for scrolling (thanks @trevorpower, @cheeves)
 void copy_to_array(byte array [][DISPLAY_WIDTH/8], 
   int x_pos, int y_pos, 
   char image[], int image_width, int image_height )
@@ -76,14 +77,16 @@ void copy_to_array(byte array [][DISPLAY_WIDTH/8],
   for(int image_y=0; image_y < image_height; image_y++ ) {
     for(int image_x=0; image_x < image_width; image_x++ ) {
       x = ( x_pos + image_x );
-      array_x =  x >> 3;   // Which byte do we write to?
-      bit_pos = x & 0x07;    // Whit bit in that byte to set?
-      
-      // Check limits
-      array_y = y_pos + image_y;
-      if( ( array_y < DISPLAY_HEIGHT ) && ( array_x < (DISPLAY_WIDTH / 8) ) )
-        if( image[image_y] & (0x80 >> image_x) )
-          array[array_y][array_x] |= (0x80 >> bit_pos);
+      if( x >= 0 ) {  // ignore stuff in negative space 
+        array_x =  x >> 3;   // Which byte do we write to?
+        bit_pos = x & 0x07;    // Whit bit in that byte to set?
+        
+        // Check limits
+        array_y = y_pos + image_y;
+        if( ( array_y < DISPLAY_HEIGHT ) && ( array_x < (DISPLAY_WIDTH / 8) ) )
+          if( image[image_y] & (0x80 >> image_x) )
+              array[array_y][array_x] |= (0x80 >> bit_pos);
+      }
     }
   }  
 };
@@ -141,11 +144,34 @@ char *font_width = FONT_5X4_WIDTH;
 int font_height = FONT_5X4_HEIGHT;
 int gutter_space = 1;
 
-void draw_text( char string[], char x_pos, char y_pos, char colour=COLOUR_RED)
+int get_string_width( char string[] ){
+  int str_size = 0;
+  char currchar;
+  
+  for( int ii=0; ii<STRING_MAX; ii++ ){
+   
+    // Find ID of char in out arrayss 
+    currchar = string[ii] - 32;
+    if(currchar >= 65 && currchar <= 90) 
+      currchar -= 32; // Make this character uppercase.
+      
+    // skip unsupported characters
+    if(currchar < 0 || currchar >= 64)
+      continue;
+     
+    str_size += font_width[currchar] + gutter_space;
+  }
+
+  return str_size;
+}
+
+// draw_text fills the appropriate array for some coloured text. It
+// allows negative positions for the purposes of scrolling
+void draw_text( char string[], int x_pos, int y_pos, char colour=COLOUR_RED)
 {
   char currchar;
-  char i = 0;
-  char cur_x = x_pos;
+  int i = 0;
+  int cur_x = x_pos;
 
   bool write_to_red_array   = false;
   bool write_to_green_array = false;
@@ -167,9 +193,10 @@ void draw_text( char string[], char x_pos, char y_pos, char colour=COLOUR_RED)
   
   // Write each char of the string to the display buffers.
   while(true) {
-    if( string[i] == '\0' )
+    if( string[i] == '\0' ) {
       break;
-      
+    }
+    
     currchar = string[i] - 32;
     
     // lowercase
@@ -183,27 +210,24 @@ void draw_text( char string[], char x_pos, char y_pos, char colour=COLOUR_RED)
     }  
     
     // off-screen
-    if(cur_x >= DISPLAY_WIDTH)
+    if(cur_x >= DISPLAY_WIDTH) {
       break;
-      
-    // Draw character
+    }
+    
+    // Draw character if some of it ends up at x >= 0
     if(cur_x + font_width[currchar] + gutter_space >= 0){
-      
       if(write_to_red_array)
-        copy_to_array(red_array, (int)cur_x, (int)y_pos, 
+        copy_to_array(red_array, cur_x, y_pos, 
           FONT_5X4[currchar], font_width[currchar], font_height);
       
       if(write_to_green_array)
-        copy_to_array(green_array, (int)cur_x, (int)y_pos, 
+        copy_to_array(green_array, cur_x, y_pos, 
           FONT_5X4[currchar], font_width[currchar], font_height);
-            
-      // Draw the gutter space
-      //for(char j = 0; j < gutter_space; ++j)
-      //  drawImage(font, 1, font_height, curr_x + font_width[currchar] + j, y, 0);
-      
-     cur_x += font_width[currchar] + gutter_space;
-     ++i;
-    }
+    }  
+    
+    // Update position and advance to next char
+    cur_x += font_width[currchar] + gutter_space;
+    i++;
     
   } // end: while
 }
@@ -218,36 +242,48 @@ void setup()
 {
   Serial.begin(9600);
   HT1632C.begin( ht1632c_cs, ht1632c_csclk, ht1632c_wrclk, ht1632c_data );
-  //HT1632C.clear_display();
+  HT1632C.clear_display();   
 }
 
 
 char disp_str[STRING_MAX] ;
-
+int x_pos=0;
+int y_pos=0;
+int string_width;
 void loop()
-{ 
-  int ii;
-  
-  if( Serial.available() ) {
-    delay(1000);
-     
+{   
+  if( Serial.available() ) {     
     // Copy serial chars into string buffer
-    for (ii=0; ii<STRING_MAX; ii++ ) {
+    for (int ii=0; ii<STRING_MAX; ii++ ) {
      if( Serial.available() > 0 )
        disp_str[ii] = Serial.read();
      else
-       disp_str[ii] = ' ';
+       disp_str[ii] = '\0'; // overwrite prev longer strings...
     }
    
     // Blank the LED array
-    clear_array(red_array);
-    clear_array(green_array);
-    HT1632C.clear_display();
-    
-    draw_text(disp_str, 0,0);
-    render();
+    x_pos = DISPLAY_WIDTH;
+    y_pos = 0;
+    string_width = get_string_width(disp_str);
+      
+  } else {
+    // Scroll existing text
+    if( x_pos == -(string_width+1) ) {
+      x_pos = DISPLAY_WIDTH;
+      // Some Y messing
+      y_pos++;
+      if(y_pos>11)
+        y_pos = 0;
+    }
+    else
+      x_pos = x_pos - 1;
   }
 
+  // Update the display
+  clear_array(red_array);
+  clear_array(green_array);
+  draw_text(disp_str, x_pos, y_pos);
   render();
+  delay(25);
 }
  
