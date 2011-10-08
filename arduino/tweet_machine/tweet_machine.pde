@@ -232,8 +232,11 @@ void loop()
     delay(1000);
      
     // Copy serial chars into string buffer
-    while( (Serial.available() > 0 ) && (ii <STRING_MAX ) ) {
-      disp_str[ii++] = Serial.read();
+    for (ii=0; ii<STRING_MAX; ii++ ) {
+     if( Serial.available() > 0 )
+       disp_str[ii] = Serial.read();
+     else
+       disp_str[ii] = ' ';
     }
    
     // Blank the LED array
