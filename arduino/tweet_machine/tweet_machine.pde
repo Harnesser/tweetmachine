@@ -20,13 +20,21 @@
 #define COLOUR_GREEN  1
 #define COLOUR_ORANGE 2
 
+// Communicate with the Sure boards on these pins:
 static const byte ht1632c_csclk = 4;  // Chip Select Shiftreg CLK
 static const byte ht1632c_cs    = 5;  // Chip Select Shiftin
 static const byte ht1632c_wrclk = 6;  // Write clock
 static const byte ht1632c_data  = 7;  // Data pin
 
+// LED matrix buffers
 byte red_array [DISPLAY_HEIGHT][DISPLAY_WIDTH/8];
 byte green_array [DISPLAY_HEIGHT][DISPLAY_WIDTH/8];
+
+// Font characteristics
+char *font_width = FONT_5X4_WIDTH;
+int font_height = FONT_5X4_HEIGHT;
+int gutter_space = 1;
+
  
 /* Cycle thru the PWM settings to produce a soothing pulsation */
 void pulsate(int board)
@@ -63,8 +71,9 @@ void clear_array(byte array [][DISPLAY_WIDTH/8] )
 }
 
 
-// Copy a small image to the full array
-// allow -ve positional values for scrolling (thanks @trevorpower, @cheeves)
+/* Copy a small image to the full array
+   allow -ve positional values for scrolling (thanks @trevorpower, @cheeves)
+*/
 void copy_to_array(byte array [][DISPLAY_WIDTH/8], 
   int x_pos, int y_pos, 
   char image[], int image_width, int image_height )
@@ -94,7 +103,10 @@ void copy_to_array(byte array [][DISPLAY_WIDTH/8],
 int x_offset [] = { 0, 2, 0, 2, 4, 6, 4, 6 };
 int y_offset [] = { 0, 0, 8, 8, 0, 0, 8, 8 };
 
-// Draw shit on the board
+/*
+ Draw stuff on the board by sending one of the display buffers to 
+ the Sure Electronics boards.
+*/
 void _render(byte array [][DISPLAY_WIDTH/8], int colour)
 {
   int data;
@@ -133,6 +145,7 @@ void _render(byte array [][DISPLAY_WIDTH/8], int colour)
   } // end: chip
 }     
 
+/* Write all image buffers to the boards */
 void render(void)
 {
   HT1632C.deselect_all();
@@ -140,11 +153,9 @@ void render(void)
   _render(red_array, 1);  
 };
 
-char *font_width = FONT_5X4_WIDTH;
-int font_height = FONT_5X4_HEIGHT;
-int gutter_space = 1;
-
-int get_string_width( char string[] ){
+/* Calculate the width of the string in LEDs including spaces */
+int get_string_width( char string[] )
+{
   int str_size = 0;
   char currchar;
   
@@ -165,8 +176,9 @@ int get_string_width( char string[] ){
   return str_size;
 }
 
-// draw_text fills the appropriate array for some coloured text. It
-// allows negative positions for the purposes of scrolling
+/* draw_text fills the appropriate array for some coloured text. It
+  allows negative positions for the purposes of scrolling
+*/
 void draw_text( char string[], int x_pos, int y_pos, char colour=COLOUR_RED)
 {
   char currchar;
@@ -232,11 +244,13 @@ void draw_text( char string[], int x_pos, int y_pos, char colour=COLOUR_RED)
   } // end: while
 }
 
+/* Copy Marty's crappy milkalbs logo to the buffers */
 void draw_milklabs_logo(char x_pos, char y_pos)
 { 
  copy_to_array(green_array, x_pos, y_pos, IMG_MILKLABS_GREEN_1, 8, 16);
  copy_to_array(green_array, x_pos+8, y_pos, IMG_MILKLABS_GREEN_2, 8, 16);
 }
+
 
 void setup()
 {
@@ -248,20 +262,107 @@ void setup()
 
 #define SERBUF_SIZE 140*5 // Roughly 5 tweets
 char serial_buffer[SERBUF_SIZE]; 
-char disp_str[STRING_MAX] ;
 int x_pos=0;
 int y_pos=0;
 int string_width;
 
 int i_serbuf;
-char startstr[] = "MILKLABTWEET";
+
+int find_next_newline(char disp_str[], int cur_pos)
+{
+   int i=cur_pos;
+   while( disp_str[cur_pos] != '\n' && disp_str[cur_pos] != '\0') {
+       cur_pos++;
+       if(cur_pos == SERBUF_SIZE)
+         return -1;
+   }
+   return cur_pos;
+}
+
+/* Draw the tweet to the image buffers.
+ Colourisation:
+ Tweeter's handle: red
+ Any occurances of milklabs: green
+ Other text: orange
+ 
+ The colourisations are tagged in each tweet by the web service
+ u:<username>\n
+ o:<text>\n
+ g:milklabs\n
+*/ 
+void draw_tweet(char disp_str[], int x_pos, int y_pos)
+{
+  int i;
+  char *substr;
+  
+  clear_array(red_array);
+  clear_array(green_array);
+  
+  // Check that we've the beginnings of a tweet. Look for
+  // 'u:' + username + '\n'
+  if( disp_str[0] != 'u' || disp_str[1] != ':' ) {
+    //Serial.println("Didn't find beginning of tweet.");
+    return;
+  }
+  i = find_next_newline(disp_str,2);
+  disp_str[i] = '\0';
+  substr = &disp_str[2];
+  draw_text(substr, x_pos, y_pos, COLOUR_RED);  
+  x_pos += get_string_width(substr);
+  Serial.print("User: ");
+  Serial.println(substr);
+  disp_str[i] = '\n';
+  substr = &disp_str[i+1];
+  
+  // 
+  while(1){
+    Serial.print("Substr: ");
+    Serial.println(substr);
+    
+    int colour = COLOUR_ORANGE;
+    if( substr[0] == 'u') {
+      Serial.println("Found start of next tweet");
+      return;
+    }
+    if( substr[1] != ':') {
+      Serial.println("Didn't get a colour spec");
+      return;
+    }
+    if( substr[0] == 'g') {
+      colour = COLOUR_GREEN;
+    }
+ 
+    i = find_next_newline(substr,2);
+    if( i < 0 ) {
+      Serial.println("No more stuff");
+      return;
+    }
+    substr[i] = '\0';
+    substr = &substr[2];
+    draw_text(substr, x_pos, y_pos, colour);
+    x_pos += get_string_width(substr);
+    Serial.print("Colour: ");
+    Serial.println(colour);
+    Serial.print(" message:");
+    Serial.println(substr);
+    
+    substr[i-2] = '\n';
+    substr = &substr[i+1-2];
+  
+  }
+  
+  //draw_text(disp_str, x_pos, y_pos);
+  render();  
+  
+}
+
 
 void loop()
 { 
   
   // Fill serial buffer with tweet goodnesss
   if( Serial.available() ) {
-    delay(100); // This delay seems to be very important
+    delay(200); // This delay seems to be very important
     i_serbuf = 0;
     while( Serial.available() > 0 ) {  
        serial_buffer[i_serbuf++] = Serial.read();  
@@ -271,17 +372,11 @@ void loop()
     Serial.println("Buffer--------");
     Serial.println(serial_buffer);
     Serial.println("--------------");
-    
-    // Copy tweet data into display buffer
-    for(int ii=0; ii<STRING_MAX; ii++ ) {
-      disp_str[ii] = serial_buffer[ii];
-    }
-    disp_str[STRING_MAX-1] = '\0';
-    
+   
     // Blank the LED array
     x_pos = DISPLAY_WIDTH;
     y_pos = 0;
-    string_width = get_string_width(disp_str);
+    string_width = get_string_width(serial_buffer); // !!!FIXME!!!
       
   } else {
     // Scroll existing text
@@ -297,10 +392,6 @@ void loop()
   }
 
   // Update the display
-  clear_array(red_array);
-  clear_array(green_array);
-  draw_text(disp_str, x_pos, y_pos);
-  render();
-  
+  draw_tweet(serial_buffer, x_pos, y_pos);  
 }
  
