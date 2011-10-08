@@ -12,6 +12,8 @@
 #include "font_5x4.h"
 #include "milklabs.h"
 
+#define STRING_MAX 60
+
 #define DISPLAY_WIDTH 64
 #define DISPLAY_HEIGHT 16
 #define COLOUR_RED    0
@@ -214,40 +216,35 @@ void draw_milklabs_logo(char x_pos, char y_pos)
 
 void setup()
 {
+  Serial.begin(9600);
   HT1632C.begin( ht1632c_cs, ht1632c_csclk, ht1632c_wrclk, ht1632c_data );
   //HT1632C.clear_display();
 }
 
-void loop()
-{  
-  HT1632C.clear_display();
-  delay(1000);
-  
-  clear_array(red_array);
-  clear_array(green_array);
 
-  // Draw a diagonal of men
-  for(int k=0; k<8; k++) {
-    copy_to_array(red_array, (8*k)+k, k, IMG_ADAM_RED, 8, 8 );
-    copy_to_array(green_array, (8*k)+k, k, IMG_ADAM_GREEN, 8, 8);
-  }  
-  render();
-  delay(1000);
+char disp_str[STRING_MAX] ;
+
+void loop()
+{ 
+  int ii;
   
-  HT1632C.clear_display();
-  clear_array(red_array);
-  clear_array(green_array);
-  
-  draw_text("Marty", 0, 0 );
-  draw_text("@milklabs", 0, 6, COLOUR_GREEN );
-  draw_text("!!!", 7, 11, COLOUR_ORANGE );
-  draw_text("!!!", 16, 11, COLOUR_GREEN );
-  draw_text("!!!", 24, 11, COLOUR_RED );
-  render();
-  delay(1000);
+  if( Serial.available() ) {
+    delay(1000);
+     
+    // Copy serial chars into string buffer
+    while( (Serial.available() > 0 ) && (ii <STRING_MAX ) ) {
+      disp_str[ii++] = Serial.read();
+    }
+   
+    // Blank the LED array
+    clear_array(red_array);
+    clear_array(green_array);
+    HT1632C.clear_display();
     
-  draw_milklabs_logo(DISPLAY_WIDTH-16, 0);
+    draw_text(disp_str, 0,0);
+    render();
+  }
+
   render();
-  delay(1000); 
 }
  
