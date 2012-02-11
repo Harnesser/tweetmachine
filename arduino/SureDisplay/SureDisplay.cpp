@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include "../HT1632C/HT1632C.h"
 #include "font_5x4.h"
+#include "milklabs.h"
 
 int x_offset [] = { 
   0, 2, 0, 2, 4, 6, 4, 6 };
@@ -31,6 +32,15 @@ void SureDisplay::clear()
     driver.clear_display();
     clear_array(red_array);
     clear_array(green_array);
+}
+
+void SureDisplay::splash()
+{ 
+  clear();
+  draw_text("milklabs", 7, 6, COLOUR_GREEN);
+  copy_to_array(green_array, 48, 0, IMG_MILKLABS_GREEN_1, 8, 16);
+  copy_to_array(green_array, 56, 0, IMG_MILKLABS_GREEN_2, 8, 16);
+  update();
 }
 
 

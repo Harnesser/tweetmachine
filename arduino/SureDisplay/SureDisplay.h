@@ -41,6 +41,7 @@ public:
     // Basic Ops
     void begin();
     void clear();
+    void splash();
     
     // Update display (copies buffer to display)
     void update(void);

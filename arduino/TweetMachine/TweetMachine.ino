@@ -10,13 +10,9 @@ int x_pos;
 
 void setup()
 {
-  delay(500);
   display.begin();
-  delay(500);
-  display.test__checkerboard();
-  delay(1000);
-  display.clear();
-  
+  display.splash();
+  delay(2000);
   x_pos = DISPLAY_WIDTH;
 }
 
@@ -25,7 +21,7 @@ void loop()
   int w_text;
   
   w_text = display.get_string_width("Milklabs");
-  display.draw_text("Milklabs", x_pos--, 6, COLOUR_GREEN);
+  display.draw_text("Milklabs", x_pos--, 6, COLOUR_ORANGE);
   display.update();
   delay(100);
   
