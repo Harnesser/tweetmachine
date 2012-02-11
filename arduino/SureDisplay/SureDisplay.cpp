@@ -217,6 +217,7 @@ void SureDisplay::draw_text( char string[], int x_pos, int y_pos, char colour=CO
   } // end: while
 }
 
+
 /* Calculate the width of the string in LEDs including spaces */
 int SureDisplay::get_string_width( char string[] )
 {
