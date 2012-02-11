@@ -84,6 +84,8 @@ class HT1632CClass
     void writeData(char, char);
     void writeDataRev(char, char);
     void writeSingleBit();
+    void start_write(int address);
+    
     void init_chips();
     void clock_cs(bool bit);
     void clock_cs(void);

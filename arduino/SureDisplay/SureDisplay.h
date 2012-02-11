@@ -26,6 +26,10 @@ protected:
 public:
     SureDisplay(int pinCS, int pinCSCLK, int pinWR, int pinDATA);
     void begin();
+    void clear();
+    
+    void test__checkerboard(void);
+    void test__sweep(void);
 };
 
 

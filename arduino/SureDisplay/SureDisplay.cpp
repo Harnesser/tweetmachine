@@ -19,3 +19,45 @@ void SureDisplay::begin()
     driver.clear_display();
 }
 
+void SureDisplay::clear()
+{
+    driver.clear_display();
+}
+
+void SureDisplay::test__checkerboard(void)
+{
+    driver.select_all();
+    driver.start_write(0x00);
+    for(int i=0; i<32; i++)
+        driver.writeDataRev(0xAA, 4);
+    driver.deselect_all();
+}
+
+void SureDisplay::test__sweep(void)
+{
+    driver.deselect_all();
+    for(int ichip=0; ichip<8; ichip++) {
+        for(int i=0; i<8; i++ ) {
+        
+            // Green
+            driver.select(ichip);
+            driver.start_write(0x00+i);
+            driver.writeDataRev(0xAA,4);
+            delay(500);
+            driver.select(ichip);
+            driver.start_write(0x00+i);
+            driver.writeDataRev(0x00, 4);
+            
+            // Red
+            driver.select(ichip);
+            driver.start_write(0x20+i);
+            driver.writeDataRev(0x55,4);
+            delay(500);
+            driver.select(ichip);
+            driver.start_write(0x20+i);
+            driver.writeDataRev(0x00, 4);
+
+        }
+        driver.select(); // next chip
+    }
+}

@@ -73,11 +73,21 @@ void HT1632CClass::setBrightness(char brightness, char selectionmask) {
  * LOWER LEVEL FUNCTIONS
  * Functions that directly talk to hardware go here:
  */
+
+/* Initialise a write to the LED array memory */
+void HT1632CClass::start_write(int address) 
+{
+  writeData(HT1632C_ID_WR, HT1632C_ID_LEN);
+  writeData(address, HT1632C_ADDR_LEN);
+}
+
  
 void HT1632CClass::writeCommand(char data) {
   writeData(data, HT1632C_CMD_LEN);
   writeSingleBit();
 } 
+
+
 // Integer write to display. Used to write commands/addresses.
 // PRECONDITION: WR is LOW
 void HT1632CClass::writeData(char data, char len) {
