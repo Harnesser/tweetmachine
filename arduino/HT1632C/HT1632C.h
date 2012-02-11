@@ -79,6 +79,7 @@ class HT1632CClass
     char _pinDATA;
     
   public:
+    HT1632CClass();
     void writeCommand(char);
     void writeData(char, char);
     void writeDataRev(char, char);

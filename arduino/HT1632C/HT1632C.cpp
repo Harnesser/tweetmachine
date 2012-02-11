@@ -1,13 +1,18 @@
 #include "HT1632C.h"
-#include "WProgram.h"
+#include "Arduino.h"
 
+
+HT1632CClass::HT1632CClass()
+{
+};
 
 /*
  * MID LEVEL FUNCTIONS
  * Functions that handle internal memory, initialize the hardware
  * and perform the rendering go here:
  */
-void HT1632CClass::begin(int pinCS, int pinCSCLK, int pinWR, int pinDATA) {
+void HT1632CClass::begin(int pinCS, int pinCSCLK, int pinWR, int pinDATA)
+{
   _pinCS    = pinCS;
   _pinCSCLK = pinCSCLK;
   _pinWR    = pinWR;
