@@ -19,17 +19,40 @@ private:
     char _pin_CSCLK;
     char _pin_WR;
     char _pin_DATA;
+
+    // LED matrix buffers
+    char red_array [DISPLAY_HEIGHT][DISPLAY_WIDTH/8];
+    char green_array [DISPLAY_HEIGHT][DISPLAY_WIDTH/8];
+
+    // Display Buffer Operations
+    void clear_array(char array [][DISPLAY_WIDTH/8] );
+    void copy_to_array(char array [][DISPLAY_WIDTH/8], 
+        int x_pos, int y_pos, 
+        char image[],
+        int image_width, int image_height );
+    void _update(char array [][DISPLAY_WIDTH/8], int colour);
     
 protected:
     HT1632CClass driver;
     
 public:
     SureDisplay(int pinCS, int pinCSCLK, int pinWR, int pinDATA);
+    
+    // Basic Ops
     void begin();
     void clear();
     
+    // Update display (copies buffer to display)
+    void update(void);
+    
+    // Writing Text
+    void draw_text( char string[], int x_pos, int y_pos,
+        char colour);
+    
+    // Testmode methods
     void test__checkerboard(void);
     void test__sweep(void);
+    void test__text(void);
 };
 
 

@@ -20,6 +20,6 @@ void setup()
 
 void loop()
 {
-  display.test__sweep();
+  display.test__text();
 }
 
