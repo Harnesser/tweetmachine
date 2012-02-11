@@ -207,6 +207,33 @@ void SureDisplay::draw_text( char string[], int x_pos, int y_pos, char colour=CO
   } // end: while
 }
 
+/* Calculate the width of the string in LEDs including spaces */
+int SureDisplay::get_string_width( char string[] )
+{
+  int str_size = 0;
+  char currchar;
+  int gutter_space = 1;
+  char *font_width = FONT_5X4_WIDTH;
+  
+  for( int ii=0; ii<STRING_MAX; ii++ ){
+    if( currchar == '\0' ) {
+        return str_size;
+    }
+    
+    // Find ID of char in out arrayss 
+    currchar = string[ii] - 32;
+    if(currchar >= 65 && currchar <= 90) 
+      currchar -= 32; // Make this character uppercase.
+
+    // skip unsupported characters
+    if(currchar < 0 || currchar >= 64)
+      continue;
+
+    str_size += font_width[currchar] + gutter_space;
+  }
+
+  return str_size;
+}
 
 
 /*

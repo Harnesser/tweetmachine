@@ -48,6 +48,7 @@ public:
     // Writing Text
     void draw_text( char string[], int x_pos, int y_pos,
         char colour);
+    int get_string_width( char string[] );
     
     // Testmode methods
     void test__checkerboard(void);
