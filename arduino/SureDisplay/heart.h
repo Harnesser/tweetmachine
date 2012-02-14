@@ -1,5 +1,5 @@
 /*
- *  miLKlabs logo. sorta.
+ *  A small heart
  */
  
  

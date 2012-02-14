@@ -1,7 +1,7 @@
 #ifndef SURE_DISPLAY_H
 #define SURE_DISPLAY_H
 
-#define STRING_MAX 60
+#define STRING_MAX 140
 
 #define DISPLAY_WIDTH 64
 #define DISPLAY_HEIGHT 16
