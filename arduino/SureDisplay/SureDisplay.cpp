@@ -3,6 +3,7 @@
 #include "../HT1632C/HT1632C.h"
 #include "font_5x4.h"
 #include "milklabs.h"
+#include "heart.h"
 
 int x_offset [] = { 
   0, 2, 0, 2, 4, 6, 4, 6 };
@@ -43,6 +44,10 @@ void SureDisplay::splash()
   update();
 }
 
+void SureDisplay::heart(int x, int y)
+{
+    copy_to_array(red_array, x, y, IMG_HEART, 8, 5);
+}
 
 /*
  * Display Buffer Operations

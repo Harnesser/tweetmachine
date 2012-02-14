@@ -16,13 +16,13 @@ byte mac[] = {
   0x90, 0xA2, 0xDA, 0x00, 0x80, 0x11}; // marty's
 //byte mac[] = { 
 //  0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x01 };
-IPAddress ip(192,168,1,100);
+IPAddress ip(192,168,1,101);
 
 // initialize the library instance:
 EthernetClient client;
 
 const int num_tweets = 1;
-const int requestInterval = 60000;  // delay between requests
+const int requestInterval = 10000; //60000;  // delay between requests
 
 
 char serverName[] = "api.twitter.com";  // twitter URL
@@ -52,8 +52,9 @@ void setup()
   }
   connectToServer(); // connect to Twitter:
   
+  // Splash screen
   display.clear();
-  display.draw_text("Connected...", 0, 6, COLOUR_ORANGE);
+  display.draw_text("Reading...", 0, 6, COLOUR_ORANGE);
   display.update();
 }
 
@@ -110,9 +111,11 @@ void loop()
     connectToServer();
   } else {
       display.clear();
+      //display.heart(0, 0);
       display.draw_text(tweets[i_tweet], x_pos--, 6, COLOUR_GREEN);
+//    display.draw_text("milklabs", x_pos--, 6, COLOUR_GREEN);
       display.update();
-      if(x_pos == 240) { // w_text) {
+      if(x_pos <= -w_text) { // w_text) {
         x_pos = DISPLAY_WIDTH;
         i_tweet++;
         if(i_tweet == num_tweets) {

@@ -42,6 +42,7 @@ public:
     void begin();
     void clear();
     void splash();
+    void heart(int x, int y);
     
     // Update display (copies buffer to display)
     void update(void);
