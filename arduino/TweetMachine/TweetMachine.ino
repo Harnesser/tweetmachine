@@ -16,13 +16,13 @@ byte mac[] = {
   0x90, 0xA2, 0xDA, 0x00, 0x80, 0x11}; // marty's
 //byte mac[] = { 
 //  0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x01 };
-IPAddress ip(192,168,1,101);
+IPAddress ip(192,168,1,100);
 
 // initialize the library instance:
 EthernetClient client;
 
-const int num_tweets = 2;
-const int requestInterval = 10000; //60000;  // delay between requests
+const int num_tweets = 1;
+const int requestInterval = 60000;  // delay between requests
 
 
 char serverName[] = "api.twitter.com";  // twitter URL
@@ -36,8 +36,8 @@ boolean readingTweet = false;       // if you're currently reading the tweet
 char i_tweet; // tweet id
 char i_char;  // current string char id
 int  w_text;  // width of current string in pixels
-char tweets[2][STRING_MAX] = { "..#1......",
-                               ".....#2..." };
+char tweets[1][STRING_MAX] = { "..#1......" };
+                               //".....#2..." };
 
 void setup()
 {
