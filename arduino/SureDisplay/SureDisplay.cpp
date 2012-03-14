@@ -4,6 +4,7 @@
 #include "font_5x4.h"
 #include "milklabs.h"
 #include "heart.h"
+#include <avr/pgmspace.h>
 
 int x_offset [] = { 
   0, 2, 0, 2, 4, 6, 4, 6 };
@@ -68,7 +69,7 @@ void SureDisplay::clear_array(char array [][DISPLAY_WIDTH/8] )
  */
 void SureDisplay::copy_to_array(char array [][DISPLAY_WIDTH/8], 
     int x_pos, int y_pos, 
-    char image[],
+    prog_char image[],
     int image_width, int image_height )
 {
   int x;
@@ -160,7 +161,7 @@ void SureDisplay::draw_text( char string[], int x_pos, int y_pos, char colour=CO
   int cur_x = x_pos;
   
   int gutter_space = 1;
-  char *font_width = FONT_5X4_WIDTH;
+  prog_char *font_width = FONT_5X4_WIDTH;
   int font_height = FONT_5X4_HEIGHT;
   
   bool write_to_red_array   = false;

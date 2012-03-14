@@ -3,13 +3,14 @@
  * Includes kerning support
  * Gaurav Manek, 2011
  */
+#include <avr/pgmspace.h>
 
 #define FONT_5X4_HEIGHT  5
 
 #define FONT_5X4_STEP_GLYPH 10
 // Number of bytes per glyph 
 
-char FONT_5X4 [][FONT_5X4_STEP_GLYPH]= {
+prog_char PROGMEM FONT_5X4 [][FONT_5X4_STEP_GLYPH]= {
  { 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000 },  //  SPACE
  { 0b10000000, 0b10000000, 0b10000000, 0b00000000, 0b10000000 },  //  !
  { 0b10100000, 0b10100000, 0b00000000, 0b00000000, 0b00000000 },  //  "
@@ -80,7 +81,7 @@ char FONT_5X4 [][FONT_5X4_STEP_GLYPH]= {
  { 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b11100000 },  //  _
 };
 
-char FONT_5X4_WIDTH [] = {
+prog_char PROGMEM FONT_5X4_WIDTH [] = {
   1, 1, 3, 5, 4, 5, 4, 1,
   2, 2, 3, 5, 2, 3, 1, 4,
   3, 3, 4, 3, 4, 3, 4, 4,

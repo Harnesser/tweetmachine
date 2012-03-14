@@ -1,9 +1,10 @@
 /*
  *  A small heart
  */
+
+#include <avr/pgmspace.h> 
  
- 
-char IMG_HEART [] = {
+prog_char PROGMEM IMG_HEART [] = {
   0b01101100,
   0b10010010,
   0b01000100,

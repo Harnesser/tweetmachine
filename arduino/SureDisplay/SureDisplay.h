@@ -11,6 +11,7 @@
 #define COLOUR_ORANGE 2
 
 #include "HT1632C.h"
+#include <avr/pgmspace.h>
 
 class SureDisplay
 {
@@ -28,7 +29,7 @@ private:
     void clear_array(char array [][DISPLAY_WIDTH/8] );
     void copy_to_array(char array [][DISPLAY_WIDTH/8], 
         int x_pos, int y_pos, 
-        char image[],
+        prog_char image[],
         int image_width, int image_height );
     void _update(char array [][DISPLAY_WIDTH/8], int colour);
     
