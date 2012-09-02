@@ -4,7 +4,7 @@
 
 #include <avr/pgmspace.h> 
 
-prog_char PROGMEM IMG_MILKLABS_GREEN_1 [] = {
+const char IMG_MILKLABS_GREEN_1 [] PROGMEM = {
   0b00000011,
   0b00001111,
   0b00011111,
@@ -23,7 +23,7 @@ prog_char PROGMEM IMG_MILKLABS_GREEN_1 [] = {
   0b11111111,
 };
 
-prog_char PROGMEM IMG_MILKLABS_GREEN_2 [] = {
+const char IMG_MILKLABS_GREEN_2 [] PROGMEM = {
   0b11110000,
   0b11111100,
   0b11111110,

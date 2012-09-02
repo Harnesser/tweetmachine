@@ -4,7 +4,7 @@
 
 #include <avr/pgmspace.h> 
  
-prog_char PROGMEM IMG_HEART [] = {
+const char IMG_HEART [] PROGMEM = {
   0b01101100,
   0b10010010,
   0b01000100,

@@ -29,7 +29,7 @@ private:
     void clear_array(char array [][DISPLAY_WIDTH/8] );
     void copy_to_array(char array [][DISPLAY_WIDTH/8], 
         int x_pos, int y_pos, 
-        prog_char image[],
+        const char image[],
         int image_width, int image_height );
     void _update(char array [][DISPLAY_WIDTH/8], int colour);
     

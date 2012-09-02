@@ -69,7 +69,7 @@ void SureDisplay::clear_array(char array [][DISPLAY_WIDTH/8] )
  */
 void SureDisplay::copy_to_array(char array [][DISPLAY_WIDTH/8], 
     int x_pos, int y_pos, 
-    prog_char image[],
+    const char image[],
     int image_width, int image_height )
 {
   int x;
@@ -87,7 +87,7 @@ void SureDisplay::copy_to_array(char array [][DISPLAY_WIDTH/8],
         // Check limits
         array_y = y_pos + image_y;
         if( ( array_y < DISPLAY_HEIGHT ) && ( array_x < (DISPLAY_WIDTH / 8) ) )
-          if( image[image_y] & (0x80 >> image_x) )
+          if( pgm_read_byte( &image[image_y] ) & (0x80 >> image_x) )
             array[array_y][array_x] |= (0x80 >> bit_pos);
       }
     }
@@ -161,7 +161,7 @@ void SureDisplay::draw_text( char string[], int x_pos, int y_pos, char colour=CO
   int cur_x = x_pos;
   
   int gutter_space = 1;
-  prog_char *font_width = FONT_5X4_WIDTH;
+  char glyph_width = 0;
   int font_height = FONT_5X4_HEIGHT;
   
   bool write_to_red_array   = false;
@@ -205,19 +205,22 @@ void SureDisplay::draw_text( char string[], int x_pos, int y_pos, char colour=CO
       break;
     }
 
+    // grab the glyph width (in pixels) from flash memory
+    glyph_width = pgm_read_byte( &FONT_5X4_WIDTH[currchar] );
+
     // Draw character if some of it ends up at x >= 0
-    if(cur_x + font_width[currchar] + gutter_space >= 0){
+    if(cur_x + glyph_width + gutter_space >= 0){
       if(write_to_red_array)
         copy_to_array(red_array, cur_x, y_pos, 
-        FONT_5X4[currchar], font_width[currchar], font_height);
+        (char*)pgm_read_word( &FONT_5X4[currchar] ), glyph_width, font_height);
 
       if(write_to_green_array)
         copy_to_array(green_array, cur_x, y_pos, 
-        FONT_5X4[currchar], font_width[currchar], font_height);
+        (char*)pgm_read_word( &FONT_5X4[currchar] ), glyph_width, font_height);
     }  
 
     // Update position and advance to next char
-    cur_x += font_width[currchar] + gutter_space;
+    cur_x += glyph_width + gutter_space;
     i++;
 
   } // end: while
@@ -230,8 +233,8 @@ int SureDisplay::get_string_width( char string[] )
   int str_size = 0;
   char currchar;
   int gutter_space = 1;
-  char *font_width = FONT_5X4_WIDTH;
-  
+  char glyph_width = 0;
+
   for( int ii=0; ii<STRING_MAX; ii++ ){
     if( currchar == '\0' ) {
         return str_size;
@@ -246,7 +249,8 @@ int SureDisplay::get_string_width( char string[] )
     if(currchar < 0 || currchar >= 64)
       continue;
 
-    str_size += font_width[currchar] + gutter_space;
+    glyph_width = pgm_read_byte( &FONT_5X4_WIDTH[currchar] );
+    str_size += glyph_width + gutter_space;
   }
 
   return str_size;
